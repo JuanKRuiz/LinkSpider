@@ -13,15 +13,12 @@ namespace SiteMapperBash
         static void Main(string[] args)
         {
             LinkSpider ls = new LinkSpider();
-            var hc = new HttpClient();
-            var htmlFragment = hc.GetStringAsync("http://juank.io").Result;
+            //var hc = new HttpClient();
+            //var htmlFragment = hc.GetStringAsync("http://juank.io").Result;
 
-            var lista = ls.GetCompleteLinksFromHtmlFragment(htmlFragment, "http://juank.io");
+            ls.ExploreSite( "http://juank.io");
 
-            foreach (var link in lista)
-            {
-                Console.WriteLine( link);
-            }
+            
             Console.ReadLine();
         }
     }

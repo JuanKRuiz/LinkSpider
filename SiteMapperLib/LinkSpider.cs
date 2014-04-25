@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,20 +34,40 @@ namespace SiteMapperLib
                 
                 if(link.StartsWith("/") || !link.Contains("://"))
                 {
+                    if(link.Contains("?"))
+                    {
+                        link = link.Remove(link.IndexOf("?"));
+                    }
+
                     uribldr.Path = link;
-                    uribldr.Query = string.Empty;
                     lista.Add(uribldr.Uri.AbsoluteUri);
                 }
                 else if (link.StartsWith(baseUrl))
                 {
                     var uri = new Uri(link);
                     uribldr.Path = uri.AbsolutePath;
-                    uribldr.Query = string.Empty;
                     lista.Add(uribldr.Uri.AbsoluteUri);
                 }
             }
 
             return lista;
+        }
+
+        public void ExploreSite(string initialUrl)
+        {
+            var initialUri = new Uri(initialUrl);
+            var baseUrl = string.Empty;
+
+            if(initialUri.Port == 80)
+                baseUrl = string.Format("{0}://{1}", initialUri.Scheme, initialUri.Host);
+            else
+                baseUrl = string.Format("{0}://{1}:{2}", initialUri.Scheme, initialUri.Host, initialUri.Port);
+
+            var hc = new HttpClient();
+            var htmlFragment = hc.GetStringAsync(initialUri).Result;
+
+
+
         }
 
     }
