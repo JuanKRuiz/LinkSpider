@@ -9,8 +9,8 @@ Full support to all LinkSpider Portable Class Library features
 ###Samples
 ####Fast create
 This creates
-*sitemap.xml : standard sitemap
-*plain.txt   : plain text file listing all links in website
+* sitemap.xml : standard sitemap
+* plain.txt   : plain text file listing all links in website
 
 ```
 LinkSpiderConsole.exe --u http://yoursite.com
@@ -23,8 +23,8 @@ LinkSpiderConsole.exe --u http://yoursite.com --s YOURsitemap.xml --p YOURplain.
 ####Navigation Filtering --n
 This avoid to explore links containing some url patterns.
 This sample shows how to avoid url  exploration when it contains this fragments
-*/tag/
-*/pages/
+* /tag/
+* /pages/
 
 ```
 LinkSpiderConsole.exe --u http://yoursite.com --n /tag/,/pages/
@@ -35,8 +35,8 @@ This is very useful to improve performance not waisting time in unuseful urls.
 ####Sitemap Filtering --m
 This avoid to include links containing some url patterns in sitemap file.
 This sample shows how to avoid some links in sitemap when it contains this fragments
-*/tag/
-*/pages/
+* /tag/
+* /pages/
 
 
 ```
