@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -10,65 +9,144 @@ namespace SiteMapperLib
 {
     public class LinkSpider
     {
-        readonly Regex rx = new Regex(@"<a.*?href=(""|')(?<href>.*?)(""|').*?>(?<value>.*?)</a>");
-  
-        public List<string> GetLinksFromHtmlFragment(string htmlFragment)
-        {
-            var lista = new List<string>();
-            foreach (Match match in rx.Matches(htmlFragment))
-            {
-                lista.Add(match.Groups["href"].Value);
-            }
+        object _lockbject = new object();
+        HttpClient _httpClient = new HttpClient();
+        readonly Regex _rx = new Regex(@"<a.*?href=(""|')(?<href>.*?)(""|').*?>(?<value>.*?)</a>");
 
-            return lista;
+        readonly Uri _originalUrl;
+        public Uri OriginalUrl
+        { get { return _originalUrl; } }
+
+        #region Lists
+        HashSet<LinkElement> _fullUrlList = new HashSet<LinkElement>(new LinkElementComparer());
+        public HashSet<LinkElement> FullUrlList
+        {
+            get { return _fullUrlList; }
         }
 
-        public List<string> GetCompleteLinksFromHtmlFragment(string htmlFragment, string baseUrl)
-        {
-            UriBuilder uribldr = new UriBuilder(baseUrl);
+        HashSet<LinkElement> _externalUrlList = new HashSet<LinkElement>(new LinkElementComparer());
+        public HashSet<LinkElement> ExternalUrlList
+        { get { return _externalUrlList; } }
 
-            var lista = new List<string>();
-            foreach (Match match in rx.Matches(htmlFragment))
+
+        HashSet<LinkElement> _brokenUrlList = new HashSet<LinkElement>(new LinkElementComparer());
+        public HashSet<LinkElement> BrokenUrlList
+        { get { return _brokenUrlList; } }
+
+        #endregion Lists
+
+        public LinkSpider(string url)
+        {
+            _originalUrl = new Uri(url);
+        }
+
+        public async Task WeaveWebAsync()
+        {
+            await Task.Run(() => { WeaveWeb(); });
+        }
+
+        public void WeaveWeb()
+        {
+            Reset();
+            var rootLink = new LinkElement() { url = _originalUrl.AbsoluteUri };
+            _fullUrlList.Add(rootLink);
+
+            List<LinkElement> nextLnks = (from lnk in _fullUrlList
+                        where lnk.explored == false
+                        select lnk).ToList();
+
+            while (nextLnks.Count() > 0)
+            {
+                Parallel.ForEach<LinkElement>(nextLnks, (le) =>
+                {
+                    ExploreLink(le);
+                });
+
+                nextLnks = (from lnk in _fullUrlList
+                            where lnk.explored == false
+                            select lnk).ToList();
+            }
+        }
+
+        HttpClient httpClient = new HttpClient();
+        private void ExploreLink(LinkElement linkElement)
+        {
+            
+            string htmlFragment = string.Empty;
+
+            try
+            {
+                htmlFragment = _httpClient.GetStringAsync(linkElement.url).Result;
+            }
+            catch
+            {
+                _brokenUrlList.Add(linkElement);
+                return;
+            }
+
+            GetCompleteLinksFromHtmlFragment(htmlFragment);
+            MarkLinkAsExplored(linkElement);
+        }
+        
+        private void MarkLinkAsExplored(LinkElement linkElement)
+        {
+            lock (_lockbject)
+            {
+                var linkElementAdded = _fullUrlList.Add(linkElement);
+
+                if (!linkElementAdded)
+                    _fullUrlList.Where(link => link.url == linkElement.url).First().explored = true;
+                else
+                    linkElement.explored = true;
+            }
+        }
+
+        private void GetCompleteLinksFromHtmlFragment(string htmlFragment)
+        {
+            UriBuilder uribldr = new UriBuilder(_originalUrl);
+
+            foreach (Match match in _rx.Matches(htmlFragment))
             {
                 var link = match.Groups["href"].Value;
-                
-                if(link.StartsWith("/") || !link.Contains("://"))
-                {
-                    if(link.Contains("?"))
-                    {
-                        link = link.Remove(link.IndexOf("?"));
-                    }
 
+                link = ClearURL(link);
+
+                if (!link.Contains("://"))
+                {
+                    uribldr.Host = _originalUrl.Host;
+                    uribldr.Port = _originalUrl.Port;
                     uribldr.Path = link;
-                    lista.Add(uribldr.Uri.AbsoluteUri);
+                    _fullUrlList.Add(new LinkElement() { url = uribldr.Uri.AbsoluteUri });
                 }
-                else if (link.StartsWith(baseUrl))
+                else if (link.StartsWith(_originalUrl.AbsoluteUri))
                 {
                     var uri = new Uri(link);
                     uribldr.Path = uri.AbsolutePath;
-                    lista.Add(uribldr.Uri.AbsoluteUri);
+                    _fullUrlList.Add(new LinkElement() { url = uribldr.Uri.AbsoluteUri });
+                }
+                else
+                {
+                    var uri = new Uri(link);
+                    if (!uri.AbsoluteUri.StartsWith(_originalUrl.AbsoluteUri))
+                        _externalUrlList.Add(new LinkElement() { url = uri.AbsoluteUri });
                 }
             }
-
-            return lista;
         }
 
-        public void ExploreSite(string initialUrl)
+        private static string ClearURL(string link)
         {
-            var initialUri = new Uri(initialUrl);
-            var baseUrl = string.Empty;
-
-            if(initialUri.Port == 80)
-                baseUrl = string.Format("{0}://{1}", initialUri.Scheme, initialUri.Host);
-            else
-                baseUrl = string.Format("{0}://{1}:{2}", initialUri.Scheme, initialUri.Host, initialUri.Port);
-
-            var hc = new HttpClient();
-            var htmlFragment = hc.GetStringAsync(initialUri).Result;
-
-
-
+            if (link.Contains("#"))
+            {
+                link = link.Remove(link.IndexOf("#"));
+            }
+            return link;
         }
 
+        private void Reset()
+        {
+            this._brokenUrlList.Clear();
+            this._externalUrlList.Clear();
+            this._fullUrlList.Clear();
+        }
     }
 }
