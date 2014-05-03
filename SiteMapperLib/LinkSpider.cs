@@ -21,18 +21,23 @@ namespace LinkSpiderLib
 
         #region Link Lists
         HashSet<LinkElement> _fullUrlList = new HashSet<LinkElement>(new LinkElementComparer());
-        public HashSet<LinkElement> FullUrlList
+        public IEnumerable<string> FullUrlList
         {
-            get { return _fullUrlList; }
+            get
+            {
+                return from le in _fullUrlList
+                       orderby le.url ascending
+                       select le.url;
+            }
         }
 
-        HashSet<LinkElement> _externalUrlList = new HashSet<LinkElement>(new LinkElementComparer());
-        public HashSet<LinkElement> ExternalUrlList
+        HashSet<string> _externalUrlList = new HashSet<string>();
+        public IEnumerable<string> ExternalUrlList
         { get { return _externalUrlList; } }
 
 
-        HashSet<LinkElement> _brokenUrlList = new HashSet<LinkElement>(new LinkElementComparer());
-        public HashSet<LinkElement> BrokenUrlList
+        HashSet<string> _brokenUrlList = new HashSet<string>();
+        public IEnumerable<string> BrokenUrlList
         { get { return _brokenUrlList; } }
 
         #endregion Link Lists
@@ -89,7 +94,7 @@ namespace LinkSpiderLib
                 }
                 catch
                 {
-                    _brokenUrlList.Add(linkElement);
+                    _brokenUrlList.Add(linkElement.url);
                     return;
                 }
 
@@ -138,7 +143,7 @@ namespace LinkSpiderLib
                 {
                     var uri = new Uri(link);
                     if (!uri.AbsoluteUri.StartsWith(_originalUrl.AbsoluteUri))
-                        _externalUrlList.Add(new LinkElement() { url = uri.AbsoluteUri });
+                        _externalUrlList.Add(uri.AbsoluteUri);
                 }
             }
         }
