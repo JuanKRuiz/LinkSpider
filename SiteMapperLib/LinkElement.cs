@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SiteMapperLib
+namespace LinkSpiderLib
 {
     [DebuggerDisplay("url = {url} , explored = {explored}")]
     public class LinkElement

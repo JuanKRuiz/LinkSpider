@@ -1,13 +1,10 @@
-﻿using SiteMapperLib;
+﻿using LinkSpiderLib;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SiteMapperBash
+namespace LinkSpiderConsole
 {
     class Program
     {
@@ -15,14 +12,24 @@ namespace SiteMapperBash
         {
             Stopwatch sw = new Stopwatch();
 
-            LinkSpider ls = new LinkSpider("http://juank.io");
-            //var hc = new HttpClient();
-            //var htmlFragment = hc.GetStringAsync("http://juank.io").Result;
+            LinkSpider ls = new LinkSpider("http://juank.io/");
 
+            ls.URLExplorationFilter.Add("/tag/");
             sw.Start();
             ls.WeaveWeb();
             sw.Stop();
-            Console.WriteLine("----A S Y N C ----");
+
+            foreach (var linkItem in ls.FullUrlList.OrderBy(linkItem => linkItem.url))
+            {
+                Console.WriteLine(linkItem.url);
+            }
+
+            var listaTxt = from linkItem in ls.FullUrlList
+                           where !linkItem.url.Contains("/tag/")
+                           && !linkItem.url.Contains("/page/")
+                           select linkItem.url;
+
+            Console.WriteLine("---- LINK SPIDER ----");
             Console.WriteLine("Time Running: {0}", sw.Elapsed);
 
             Console.WriteLine("Total Links: {0}", ls.FullUrlList.Count);
@@ -30,11 +37,11 @@ namespace SiteMapperBash
             Console.WriteLine("Total External Links: {0}", ls.ExternalUrlList.Count);
             Console.WriteLine("Total Broken Links: {0}", ls.BrokenUrlList.Count);
 
+            var tarantula = new SitemapTarantula(listaTxt);
 
-            /*foreach (var linkItem in ls.FullUrlList.OrderBy(linkItem => linkItem.url))
-            {
-                Console.WriteLine(linkItem.url);
-            }*/
+            var sitemap = tarantula.CreateStringSiteMap();
+            File.WriteAllText("sitemap.xml", sitemap);
+
 
             Console.ReadLine();
         }

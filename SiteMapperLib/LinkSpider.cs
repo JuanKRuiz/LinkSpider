@@ -5,19 +5,21 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SiteMapperLib
+namespace LinkSpiderLib
 {
     public class LinkSpider
     {
         object _lockbject = new object();
         HttpClient _httpClient = new HttpClient();
-        readonly Regex _rx = new Regex(@"<a.*?href=(""|')(?<href>.*?)(""|').*?>(?<value>.*?)</a>");
+        readonly Regex _rx = new Regex(@"<a.*?href=(""|')(?<href>.*?)(""|').*?>.*?</a>");
+
+        public List<string> URLExplorationFilter { get; set; }
 
         readonly Uri _originalUrl;
         public Uri OriginalUrl
         { get { return _originalUrl; } }
 
-        #region Lists
+        #region Link Lists
         HashSet<LinkElement> _fullUrlList = new HashSet<LinkElement>(new LinkElementComparer());
         public HashSet<LinkElement> FullUrlList
         {
@@ -33,11 +35,12 @@ namespace SiteMapperLib
         public HashSet<LinkElement> BrokenUrlList
         { get { return _brokenUrlList; } }
 
-        #endregion Lists
+        #endregion Link Lists
 
         public LinkSpider(string url)
         {
             _originalUrl = new Uri(url);
+            URLExplorationFilter = new List<string>();
         }
 
         public async Task WeaveWebAsync()
@@ -52,8 +55,8 @@ namespace SiteMapperLib
             _fullUrlList.Add(rootLink);
 
             List<LinkElement> nextLnks = (from lnk in _fullUrlList
-                        where lnk.explored == false
-                        select lnk).ToList();
+                                          where lnk.explored == false
+                                          select lnk).ToList();
 
             while (nextLnks.Count() > 0)
             {
@@ -71,23 +74,30 @@ namespace SiteMapperLib
         HttpClient httpClient = new HttpClient();
         private void ExploreLink(LinkElement linkElement)
         {
-            
             string htmlFragment = string.Empty;
 
-            try
+            if (MatchExplorationFilters(linkElement.url))
             {
-                htmlFragment = _httpClient.GetStringAsync(linkElement.url).Result;
-            }
-            catch
-            {
-                _brokenUrlList.Add(linkElement);
-                return;
-            }
+                linkElement.explored = true;
 
-            GetCompleteLinksFromHtmlFragment(htmlFragment);
-            MarkLinkAsExplored(linkElement);
+            }
+            else
+            {
+                try
+                {
+                    htmlFragment = _httpClient.GetStringAsync(linkElement.url).Result;
+                }
+                catch
+                {
+                    _brokenUrlList.Add(linkElement);
+                    return;
+                }
+
+                GetCompleteLinksFromHtmlFragment(htmlFragment);
+                MarkLinkAsExplored(linkElement);
+            }
         }
-        
+
         private void MarkLinkAsExplored(LinkElement linkElement)
         {
             lock (_lockbject)
@@ -133,6 +143,19 @@ namespace SiteMapperLib
             }
         }
 
+        private bool MatchExplorationFilters(string link)
+        {
+            foreach (var filter in URLExplorationFilter)
+            {
+                if(link.Contains(filter))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
         private static string ClearURL(string link)
         {
             if (link.Contains("#"))

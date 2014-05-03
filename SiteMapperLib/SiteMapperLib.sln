@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMapperLib", "SiteMapperLib.csproj", "{5A601283-5E1A-4C53-9F91-C31770D83B0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkSpider", "LinkSpider.csproj", "{5A601283-5E1A-4C53-9F91-C31770D83B0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMapperBash", "..\SiteMapperBash\SiteMapperBash.csproj", "{AD9AC316-96B6-4545-8FF9-F457AE3F4747}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkSpiderConsole", "..\SiteMapperBash\LinkSpiderConsole.csproj", "{AD9AC316-96B6-4545-8FF9-F457AE3F4747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

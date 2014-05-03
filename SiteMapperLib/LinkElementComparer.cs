@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SiteMapperLib
+namespace LinkSpiderLib
 {
                     
     public class LinkElementComparer: IEqualityComparer<LinkElement>
