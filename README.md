@@ -1,7 +1,10 @@
 Link Spider
 ===========
 
-This High performance Portable Library and Console Client search for links in a website and can creates standard sitemap.xml file.
+**Link Spider** is a High performance **Portable** Class Library and **Console Client** searching for links in a website and creating standard **sitemap.xml** file.
+
+* Library works with parallel tasks to reach maximum perfomance
+* async - await operations support
 
 ##LinkSpider Console Features
 Full support to all LinkSpider Portable Class Library features
