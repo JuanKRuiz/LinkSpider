@@ -21,8 +21,7 @@ namespace LinkSpiderConsole
 
         static void Main(string[] args)
         {
-            ConsoleExt.WriteTitle(" LinkSpider Console by @JuanKRuiz ", true);
-
+            DrawHeader();
 
             var paramsOptions = ParseParameters(args);
             if (args.Length == 0)
@@ -54,6 +53,9 @@ namespace LinkSpiderConsole
                 Console.WriteLine("{0} OK", _plainFile);
                 BuildPlainFile("brokenLinks.txt", ls.BrokenUrlList);
                 Console.WriteLine("{0} OK", "brokenLinks.txt");
+                BuildPlainFile("externalLinks.txt", ls.ExternalUrlList);
+                Console.WriteLine("{0} OK", "externalLinks.txt");
+
                 int counter;
                 BuildSiteMap(_sitemapFile, _useUnicode, sortedList, _urlSitemapFilter, out counter);
                 Console.WriteLine("{0} en formato Unicode: {1} OK", _sitemapFile, _useUnicode);
@@ -65,6 +67,17 @@ namespace LinkSpiderConsole
             Console.ReadLine();
 #endif
             ConsoleExt.WriteTitle("  F  I  N  ", true);
+        }
+
+        private static void DrawHeader()
+        {
+            ConsoleExt.WriteTitle(" LinkSpider Console by @JuanKRuiz ", true);
+            Console.WriteLine(" Licensed under MIT license");
+            ConsoleExt.WriteTitle("    Contact Info     ", true);
+            Console.WriteLine("Twitter: @JuanKRuiz");
+            Console.WriteLine("Facebook: JuanKDev");
+            Console.WriteLine("Blog: http://juank-io");
+            ConsoleExt.WriteTitle("                     ");
         }
 
         private static void BuildSiteMap(string sitemapFile, bool useUnicode, List<string> sortedList, List<string> filter, out int count)

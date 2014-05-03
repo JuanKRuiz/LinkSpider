@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LinkSpiderLib</RootNamespace>
-    <AssemblyName>SiteMapperLib</AssemblyName>
+    <AssemblyName>LinkSpiderLib</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile44</TargetFrameworkProfile>
     <DefaultLanguage>en-US</DefaultLanguage>
