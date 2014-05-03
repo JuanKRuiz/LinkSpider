@@ -11,7 +11,6 @@ namespace LinkSpiderLib
         IEnumerable<string> _urlSitemapFilter;
         public int Count { get; set; }
 
-
         public SitemapTarantula(IEnumerable<string> urlList)
         {
             _URLList = urlList;
