@@ -66,6 +66,13 @@ This sample shows how to avoid some links in sitemap when it contains this fragm
 LinkSpiderConsole.exe --u http://yoursite.com --m /tag/,/pages/
 ```
 
+####Single webpage mode
+Every execution mode listed before also support `--o` special parameter to analyze just the page passed as parameter.
+
+```
+LinkSpiderConsole.exe --u http://yoursite.com/myWebPage --m /tag/,/pages/ --o
+```
+
 ###Additional files
 This tool creates optionally 2 differente files :
 * brokenLinks.txt: including broken links targeting current site
