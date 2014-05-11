@@ -12,6 +12,7 @@ This proyect also includes a **Console Client** as an utility to generate sitema
 
 ###LinkSpider Class
 * High performance
+* Explore single webpages using parallel features
 * Explore websites using parallel features
 * Ready for async / await  operations
 * Broken links list in the website 
