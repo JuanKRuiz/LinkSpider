@@ -1,10 +1,29 @@
 Link Spider
 ===========
 
-**Link Spider** is a High performance **Portable** Class Library and **Console Client** searching for links in a website and creating standard **sitemap.xml** file.
+**Link Spider** is a High performance **Portable** Class Library searching for links in a website allowing you [optionally] creating standard **sitemap.xml** file.
+
+This proyect also includes a **Console Client** as an utility to generate sitemap.xml of any site.
 
 * Library works with parallel tasks to reach maximum perfomance
 * async - await operations support
+
+##LinkSpider Portable Class Library Features
+
+###LinkSpider Class
+* High performance
+* Explore websites using parallel features
+* Ready for async / await  operations
+* Broken links list in the website 
+* List with all website links
+* List with all external links
+* Support exploration filters to avoid browse for links in pages including some url patterns
+
+###SitemapTarantula Class
+* Builds standard sitemap.xml file
+* Support output filtering to exclude links with some url patterns
+* Support data generation in Unicode and UTF8 Encodings
+
 
 ##LinkSpider Console Features
 Full support to all LinkSpider Portable Class Library features
@@ -51,18 +70,3 @@ This tool creates optionally 2 differente files :
 * brokenLinks.txt: including broken links targeting current site
 * externalLinks.txt: including all links targeting to other domains
 
-##LinkSpider Portable Class Library Features
-
-###LinkSpider Class
-* High performance
-* Explore websites using parallel features
-* Ready for async / await  operations
-* Broken links list in the website 
-* List with all website links
-* List with all external links
-* Support exploration filters to avoid browse for links in pages including some url patterns
-
-###SitemapTarantula Class
-* Builds standard sitemap.xml file
-* Support output filtering to exclude links with some url patterns
-* Support data generation in Unicode and UTF8 Encodings
