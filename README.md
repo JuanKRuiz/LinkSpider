@@ -1,7 +1,7 @@
 Link Spider
 ===========
 
-**Link Spider** is a High performance **Portable** Class Library searching for links in a website allowing you [optionally] creating standard **sitemap.xml** file.
+**Link Spider** is a High performance **Portable** Class Library searching for links in a website or webpage allowing you [optionally] creating standard **sitemap.xml** file.
 
 This proyect also includes a **Console Client** as an utility to generate sitemap.xml of any site.
 
