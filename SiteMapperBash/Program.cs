@@ -16,6 +16,7 @@ namespace LinkSpiderConsole
         static string _plainFile = "plain.txt";
         static bool _show_help = false;
         static bool _useUnicode = false;
+        static bool _singleWebPage = false;
         static List<string> _urlNavFilter = new List<string>();
         static List<string> _urlSitemapFilter = new List<string>();
 
@@ -23,6 +24,7 @@ namespace LinkSpiderConsole
         {
             DrawHeader();
 
+            //almost all important logic in this program is derivated from this line
             var paramsOptions = ParseParameters(args);
             if (args.Length == 0)
             {
@@ -39,7 +41,12 @@ namespace LinkSpiderConsole
                 Console.WriteLine("Starting to Weave Web");
                 Console.WriteLine("Exploring and Bulding...");
                 sw.Start();
-                ls.WeaveWeb();
+                
+                if (_singleWebPage)
+                    ls.WeaveSinglePage();
+                else
+                    ls.WeaveWeb();
+
                 sw.Stop();
                 Console.WriteLine("An incredible Web has been Weaved");
                 Console.WriteLine("Total Links: {0}", ls.FullUrlList.Count());
@@ -145,9 +152,13 @@ namespace LinkSpiderConsole
                     { "c|unicode",  "Use unicode Encoding for sitemap", 
                       u => _useUnicode = (u != null )
                     },
+                    { "o|single",  "Single web page scan", 
+                      o => _singleWebPage = (o != null )
+                    },
                     { "h|?|help",  "Show this message and exit", 
                       v => _show_help = (v != null )
                     }
+
             };
 
             try

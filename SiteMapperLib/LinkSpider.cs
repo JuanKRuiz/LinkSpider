@@ -76,7 +76,31 @@ namespace LinkSpiderLib
             }
         }
 
-        HttpClient httpClient = new HttpClient();
+        public async Task WeaveSinglePageAsync()
+        {
+            await Task.Run(() => { WeaveSinglePage(); });
+        }
+
+        public void WeaveSinglePage()
+        {
+            Reset();
+            string htmlFragment = string.Empty;
+            var rootLink = new LinkElement() { url = _originalUrl.AbsoluteUri };
+            _fullUrlList.Add(rootLink);
+            
+            try
+            {
+                htmlFragment = _httpClient.GetStringAsync(_originalUrl.AbsoluteUri).Result;
+            }
+            catch
+            {
+                _brokenUrlList.Add(_originalUrl.AbsoluteUri);
+                return;
+            }
+
+            GetCompleteLinksFromHtmlFragment(htmlFragment);
+        }
+
         private void ExploreLink(LinkElement linkElement)
         {
             string htmlFragment = string.Empty;
@@ -102,6 +126,7 @@ namespace LinkSpiderLib
                 MarkLinkAsExplored(linkElement);
             }
         }
+
 
         private void MarkLinkAsExplored(LinkElement linkElement)
         {
@@ -152,7 +177,7 @@ namespace LinkSpiderLib
         {
             foreach (var filter in URLExplorationFilter)
             {
-                if(link.Contains(filter))
+                if (link.Contains(filter))
                 {
                     return true;
                 }
@@ -160,7 +185,7 @@ namespace LinkSpiderLib
 
             return false;
         }
-        
+
         private static string ClearURL(string link)
         {
             if (link.Contains("#"))
