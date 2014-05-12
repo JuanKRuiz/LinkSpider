@@ -1,7 +1,7 @@
 Link Spider
 ===========
 
-**Link Spider** is a High performance **Portable** Class Library searching for links in a website allowing you [optionally] creating standard **sitemap.xml** file.
+**Link Spider** is a High performance **Portable** Class Library searching for links in a website or webpage allowing you [optionally] creating standard **sitemap.xml** file.
 
 This proyect also includes a **Console Client** as an utility to generate sitemap.xml of any site.
 
@@ -12,6 +12,7 @@ This proyect also includes a **Console Client** as an utility to generate sitema
 
 ###LinkSpider Class
 * High performance
+* Explore single webpages using parallel features
 * Explore websites using parallel features
 * Ready for async / await  operations
 * Broken links list in the website 
@@ -63,6 +64,13 @@ This sample shows how to avoid some links in sitemap when it contains this fragm
 
 ```
 LinkSpiderConsole.exe --u http://yoursite.com --m /tag/,/pages/
+```
+
+####Single webpage mode
+Every execution mode listed before also support `--o` special parameter to analyze just the page passed as parameter.
+
+```
+LinkSpiderConsole.exe --u http://yoursite.com/myWebPage --m /tag/,/pages/ --o
 ```
 
 ###Additional files
