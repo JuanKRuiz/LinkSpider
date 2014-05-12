@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkSpider", "LinkSpider.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkSpiderConsole", "..\SiteMapperBash\LinkSpiderConsole.csproj", "{AD9AC316-96B6-4545-8FF9-F457AE3F4747}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{14453156-8E8F-4997-876F-D4ADC3B9B07E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\LingSpider-logo.png = ..\..\..\Downloads\LingSpider-logo.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

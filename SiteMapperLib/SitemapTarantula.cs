@@ -7,6 +7,10 @@ namespace LinkSpiderLib
 {
     public class SitemapTarantula
     {
+
+        const string UTF16_HEADER = @"<?xml version=""1.0"" encoding=""utf-16""?>";
+        const string UTF8_HEADER = @"<?xml version=""1.0"" encoding=""utf-8""?>";
+
         IEnumerable<string> _URLList;
         IEnumerable<string> _urlSitemapFilter;
         public int Count { get; set; }
@@ -83,8 +87,14 @@ namespace LinkSpiderLib
 
             var xdoc = CreateXMLDocumentSitemap();
             xdoc.Save(sw);
-            return sw.ToString();
+
+            var ret = sw.ToString();
+            if (changeDeclarationTextToUTF8)
+                ret = ret.Replace(UTF16_HEADER, UTF8_HEADER);
+
+            return ret;
         }
+
 
         public byte[] CreateByteArrSiteMapUTF8()
         {
@@ -94,7 +104,10 @@ namespace LinkSpiderLib
             xdoc.Save(sw);
 
             var utf16string = sw.ToString();
-            return Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(utf16string));
+
+            var utf8tring = utf16string.Replace(UTF16_HEADER, UTF8_HEADER);
+
+            return Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(utf8tring));
         }
     }
 }

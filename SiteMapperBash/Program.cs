@@ -41,7 +41,7 @@ namespace LinkSpiderConsole
                 Console.WriteLine("Starting to Weave Web");
                 Console.WriteLine("Exploring and Bulding...");
                 sw.Start();
-                
+
                 if (_singleWebPage)
                     ls.WeaveSinglePage();
                 else
