@@ -3,96 +3,117 @@
 [![Build Status](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Link Spider** is a high-performance, fully asynchronous, cross-platform library and command-line utility for crawling websites, discovering broken or external links, and generating standard, compliant `sitemap.xml` files. 
-
-Completely modernized from legacy .NET Framework to **.NET 10.0** and **C# 14**, it features thread-safe concurrent architecture, robust relative URI resolution, non-blocking async network operations, and optimized regex-based link extraction.
+**Link Spider** is a professional, high-performance, and fully asynchronous .NET 10.0 C# 14 platform consisting of a **reusable open-source Class Library** (`SiteMapperLib`) and a **standalone command-line CLI executable** (`SiteMapperBash`) for website crawling, broken link discovery, and XML sitemap generation.
 
 ---
 
-## ✨ Features
+## 📐 Dual-Purpose Architecture
 
-- **High-Performance Concurrent Engine:** Leverages `ConcurrentDictionary` and `SemaphoreSlim` to achieve thread-safe, throttle-controlled parallel crawling.
-- **Asynchronous & Non-Blocking:** Full end-to-end `async/await` execution pipeline to prevent ThreadPool starvation and maximize throughput.
-- **Perfect Relative Pathing Resolution:** Dynamically resolves relative paths using the actual page of origin URL as base (`new Uri(baseUri, relativeUri)`), avoiding broken pathing traps on nested routes.
-- **Robust Case-Insensitive Matching:** Pre-compiled, highly optimized Regex matching for anchor tags (`<a href="...">`), supporting any casing, single or double quotes, and multi-attribute links.
-- **Sitemap Filtering:** Full support to exclude specific URL patterns from being crawled or listed in the generated XML sitemap.
-- **Cross-Platform:** Built natively on .NET 10.0, running flawlessly on Linux, macOS, and Windows.
-- **Developer-Friendly VS Code Integration:** Complete with pre-configured `.vscode/` settings, compilation tasks, and debugger profiles.
+This repository is strictly decoupled into two core components:
+
+1. **`SiteMapperLib` (The Library):** An open-source, thread-safe, and fully asynchronous crawling engine. You can reference this library in any .NET application to crawl websites programmatically.
+2. **`SiteMapperBash` (The Command-Line Tool):** A pre-compiled, highly efficient CLI tool that consumes `SiteMapperLib` to let developers and administrators run site-wide crawls and generate XML sitemaps natively from the command line.
 
 ---
 
-## 📂 Project Structure
+## 🛠️ 1. Developer Class Library (`SiteMapperLib`)
 
-```
-LinkSpider/
-├── SiteMapperLib/         # Core engine (.NET 10 Class Library)
-│   ├── LinkSpider.cs      # Asynchronous crawler orchestrator
-│   └── SitemapTarantula.cs # Compliant XML sitemap builder
-├── SiteMapperBash/        # Command-Line Interface (.NET 10 Console App)
-│   └── Program.cs         # CLI execution shell & Option Parser
-├── SiteMapperTests/       # Unit Testing Suite (xUnit)
-│   └── SitemapTarantulaTests.cs
-└── .vscode/               # VS Code workspace integration
-```
+The library is targeted at **.NET 10.0** and exploits all modern C# 14 capabilities (such as Field-Backed Properties with the `field` keyword, Primary Constructors, and Collection Expressions) to achieve maximum performance and memory efficiency.
 
----
+### Quick Start Code Snippet
 
-## 🚀 Getting Started
+To crawl a site and generate a sitemap programmatically, reference the `SiteMapperLib` assembly and run:
 
-### Prerequisites
-- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+```csharp
+using System;
+using System.Threading.Tasks;
+using LinkSpiderLib;
 
-### Installation
-Clone the repository and compile:
-```bash
-git clone https://github.com/JuanKRuiz/LinkSpider.git
-cd LinkSpider
-dotnet build SiteMapperBash/LinkSpiderConsole.csproj
-```
+// 1. Initialize the crawling orchestrator
+using var spider = new LinkSpider("https://yoursite.com");
 
----
+// 2. Add exploration filters to ignore specific paths (optional)
+spider.URLExplorationFilter.AddRange(["/tag/", "/wp-content/"]);
 
-## 💻 CLI Usage
+// 3. Weave the web asynchronously (highly efficient, thread-safe concurrent crawler)
+await spider.WeaveWebAsync(maxDegreeOfParallelism: 8);
 
-The console client (`LinkSpiderConsole`) allows rapid, configurable site scans.
+// 4. Access discovered link lists
+Console.WriteLine($"Discovered {spider.FullUrlList.Count()} internal links.");
+Console.WriteLine($"Discovered {spider.ExternalUrlList.Count()} external links.");
+Console.WriteLine($"Found {spider.BrokenUrlList.Count()} broken links!");
 
-### Quick Scan
-Generates a standard `sitemap.xml` and a flat list `plain.txt` of all discovered internal links:
-```bash
-dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://yoursite.com
-```
-
-### Advanced Usage
-
-#### Customizing Output Files (`--s`, `--p`)
-```bash
-dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://yoursite.com --s MySitemap.xml --p AllLinks.txt
-```
-
-#### Navigation Filtering (`--n`)
-Prevents exploring links matching specific patterns (e.g. `/tag/` or `/pages/` folders):
-```bash
-dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://yoursite.com --n /tag/,/pages/
-```
-
-#### Sitemap Exclusions (`--m`)
-Crawls the links but excludes them from appearing in the generated `sitemap.xml`:
-```bash
-dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://yoursite.com --m /tag/,/pages/
-```
-
-#### Single Page Mode (`--o`)
-Scans and analyzes only the single provided page, without deep-crawling outward links:
-```bash
-dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://yoursite.com/somepage --o
+// 5. Build and save a fully compliant XML sitemap
+var tarantula = new SitemapTarantula(spider.FullUrlList);
+var sitemapXml = tarantula.CreateXMLDocumentSitemap();
+sitemapXml.Save("sitemap.xml");
 ```
 
 ---
 
-## 🧪 Running Tests
+## 💻 2. Standalone Command-Line Tool (`LinkSpiderConsole`)
 
-The test suite includes a thorough set of xUnit tests verifying the parser, collections, and filtering:
+For users who just want to use the pre-built command-line crawling tool without writing code, `LinkSpiderConsole` is packaged as a ready-to-run binary. You can build it as a native, single-file executable or download pre-compiled versions from the [GitHub Releases](https://github.com/JuanKRuiz/LinkSpider/releases).
+
+### Compiling the Standalone Executable
+
+To compile a native, portable release of the console client, execute:
+
 ```bash
+# 1. Publish the project to a local directory (dist)
+dotnet publish SiteMapperBash/LinkSpiderConsole.csproj -c Release -o ./dist
+```
+
+### Running the Executable Directly
+
+Once compiled or downloaded, run the binary directly from your terminal (**avoiding slow `dotnet run` calls**):
+
+```bash
+# On Linux / macOS:
+./dist/LinkSpiderConsole --url https://yoursite.com
+
+# On Windows:
+dist\LinkSpiderConsole.exe --url https://yoursite.com
+```
+
+### ⚙️ Command-Line Options
+
+The utility is fully configurable via parameters:
+
+| Flag | Parameter | Description |
+| :--- | :--- | :--- |
+| `-u` | `--url=VALUE` | **Required.** The target website URL to start link exploration. |
+| `-s` | `--sitemap=VALUE`| Custom filename for the generated XML sitemap (Default: `sitemap.xml`). |
+| `-p` | `--plain=VALUE`  | Custom filename for the list of discovered internal links (Default: `plain.txt`). |
+| `-n` | `--navfilter=VAL`| Comma-separated paths to ignore during crawling (e.g., `/tag/,/pages/`). |
+| `-m` | `--smapfilter=V` | Comma-separated paths to exclude from the sitemap (but still crawl them). |
+| `-c` | `--unicode`      | Use Unicode encoding for the output sitemap.xml. |
+| `-o` | `--single`       | Single page scan mode (scans the landing page only; does not recurse). |
+| `-h` | `--help`         | Show the help manual and parameter list. |
+
+#### Examples of Executable Commands:
+
+* **Basic Crawl and Sitemap Generation:**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com
+  ```
+* **Ignore admin and login folders:**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com --navfilter /admin/,/login/
+  ```
+* **Single-page crawl (checking homepage links only):**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com --single --plain homepage_links.txt
+  ```
+
+---
+
+## 🧪 Testing and Integration
+
+Both components are thoroughly validated via an automated xUnit test suite running under .NET 10.0:
+
+```bash
+# Execute unit test suites natively
 dotnet test SiteMapperTests/SiteMapperTests.csproj
 ```
 
@@ -102,7 +123,7 @@ dotnet test SiteMapperTests/SiteMapperTests.csproj
 
 Open the root folder in VS Code to utilize:
 - **Build Task (`Ctrl+Shift+B`):** Automatic solution compilation.
-- **Debugging (`F5`):** Complete coreclr debugging with breakpoint support, pre-configured to build the latest source.
+- **Debugging (`F5`):** Complete coreclr debugging with breakpoint support, pre-configured to build and execute the latest source.
 - **Code Hygiene:** Formats on save and auto-organizes imports to maintain high coding standards.
 
 ---
