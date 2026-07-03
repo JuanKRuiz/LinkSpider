@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Debug LinkSpider (Console)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "dotnet",
+      "args": [
+        "${workspaceFolder}/SiteMapperBash/bin/Debug/net9.0/LinkSpiderConsole.dll",
+        "--u",
+        "https://example.com"
+      ],
+      "cwd": "${workspaceFolder}/SiteMapperBash",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

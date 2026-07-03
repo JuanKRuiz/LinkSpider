@@ -1,0 +1,10 @@
+{
+  "dotnet.defaultSolution": "SiteMapperLib/LinkSpider.sln",
+  "csharp.unitTestDebuggingOptions": {
+    "console": "internalConsole"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  }
+}

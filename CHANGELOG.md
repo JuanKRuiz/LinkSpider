@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Control de Concurrencia:** Incorporado `SemaphoreSlim` para regular de forma segura el grado de paralelismo máximo de las peticiones HTTP concurrentes.
 - **Gestión de Recursos Práctica:** Implementado el patrón `IDisposable` sobre `LinkSpider` para liberar el ciclo de vida del `HttpClient` y adaptada su instanciación en `Program.cs` mediante la declaración simplificada `using var` de C#.
 - **Robustez de Red:** Añadido cabezal de `User-Agent` personalizado por defecto para evitar bloqueos por políticas anti-bot de servidores web de hosting.
+- **Integración con VS Code:** Creada la configuración del workspace en `.vscode/` (incluyendo `tasks.json` para construcción de solución nativa de MSBuild, `launch.json` para depuración de extremo a extremo mediante el depurador de coreclr de C# Dev Kit, y `settings.json` para precarga de la solución).
 
 ### 🐛 Bug Fixes
 - **Eliminación de Condiciones de Carrera (Race Conditions):** Corregida la inseguridad de hilos al procesar listas concurrentes mediante la transición de `HashSet<T>` a colecciones thread-safe concurrentes (`ConcurrentDictionary<string, LinkElement>` y `ConcurrentDictionary<string, byte>`).
