@@ -3,7 +3,9 @@
 [![Build Status](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Link Spider** is a professional, high-performance, and fully asynchronous .NET 10.0 C# 14 platform consisting of a **reusable open-source Class Library** (`SiteMapperLib`) and a **standalone command-line CLI executable** (`SiteMapperBash`) for website crawling, broken link discovery, and XML sitemap generation.
+**Link Spider** is a professional, high-performance, and fully asynchronous .NET 10.0 C# 14 platform for website crawling, broken link discovery, and XML sitemap generation. 
+
+It is designed for both **developers** looking for a reusable library, and **IT/SEO professionals** who want a ready-to-use, precompiled command-line tool with zero dependencies.
 
 ---
 
@@ -11,14 +13,82 @@
 
 This repository is strictly decoupled into two core components:
 
-1. **`SiteMapperLib` (The Library):** An open-source, thread-safe, and fully asynchronous crawling engine. You can reference this library in any .NET application to crawl websites programmatically.
-2. **`SiteMapperBash` (The Command-Line Tool):** A pre-compiled, highly efficient CLI tool that consumes `SiteMapperLib` to let developers and administrators run site-wide crawls and generate XML sitemaps natively from the command line.
+1. **`SiteMapperBash` (The Command-Line Tool):** A pre-compiled, highly efficient command-line utility. Download the native file for your platform, extract, and run immediately.
+2. **`SiteMapperLib` (The Developer Library):** An open-source, thread-safe, and fully asynchronous crawling library to use inside other .NET projects.
 
 ---
 
-## 🛠️ 1. Developer Class Library (`SiteMapperLib`)
+## 💻 1. Standalone Command-Line Tool (`LinkSpiderConsole`)
 
-The library is targeted at **.NET 10.0** and exploits all modern C# 14 capabilities (such as Field-Backed Properties with the `field` keyword, Primary Constructors, and Collection Expressions) to achieve maximum performance and memory efficiency.
+For users who want to run site-wide crawls, check broken links, and generate sitemaps without installing any development tools or writing code.
+
+### 🚀 Direct Download (No .NET Installation Required)
+
+These binaries are fully **self-contained** and **single-file**. They include the entire lightweight .NET 10.0 runtime pre-packaged inside, so they run anywhere out-of-the-box.
+
+| Operating System | Format | Processor | Direct Download Link |
+| :--- | :---: | :--- | :--- |
+| **Windows** | `.zip` | x64 (64-bit) | [📥 Download for Windows (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-win-x64.zip) |
+| **Linux** | `.tar.gz` | x64 (64-bit) | [📥 Download for Linux (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-linux-x64.tar.gz) |
+| **macOS (Apple Silicon)** | `.tar.gz` | ARM64 (M1/M2/M3/M4) | [📥 Download for macOS (Apple Silicon)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-arm64.tar.gz) |
+| **macOS (Intel)** | `.tar.gz` | x64 (64-bit) | [📥 Download for macOS (Intel x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-x64.tar.gz) |
+
+> [!TIP]
+> **Quick Start for Linux / macOS Users:**
+> After downloading, remember to grant execution permissions to the binary:
+> ```bash
+> tar -xzf LinkSpiderConsole-linux-x64.tar.gz
+> chmod +x LinkSpiderConsole
+> ./LinkSpiderConsole --url https://yoursite.com
+> ```
+
+### 🏃 Running the Executable
+
+Run the binary directly from your terminal (**avoiding slow `dotnet run` calls**):
+
+```bash
+# On Linux / macOS:
+./LinkSpiderConsole --url https://yoursite.com
+
+# On Windows:
+LinkSpiderConsole.exe --url https://yoursite.com
+```
+
+### ⚙️ Command-Line Options
+
+The utility is fully configurable via parameters:
+
+| Flag | Parameter | Description |
+| :--- | :--- | :--- |
+| `-u` | `--url=VALUE` | **Required.** The target website URL to start link exploration. |
+| `-s` | `--sitemap=VALUE`| Custom filename for the generated XML sitemap (Default: `sitemap.xml`). |
+| `-p` | `--plain=VALUE`  | Custom filename for the list of discovered internal links (Default: `plain.txt`). |
+| `-n` | `--navfilter=VAL`| Comma-separated paths to ignore during crawling (e.g., `/tag/,/pages/`). |
+| `-m` | `--smapfilter=V` | Comma-separated paths to exclude from the sitemap (but still crawl them). |
+| `-c` | `--unicode`      | Use Unicode encoding for the output sitemap.xml. |
+| `-o` | `--single`       | Single page scan mode (scans the landing page only; does not recurse). |
+| `-h` | `--help`         | Show the help manual and parameter list. |
+
+### 📝 Usage Examples
+
+* **Basic Crawl and Sitemap Generation:**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com
+  ```
+* **Ignore admin and login folders:**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com --navfilter /admin/,/login/
+  ```
+* **Single-page crawl (checking homepage links only):**
+  ```bash
+  ./LinkSpiderConsole --url https://example.com --single --plain homepage_links.txt
+  ```
+
+---
+
+## 🛠️ 2. Developer Class Library (`SiteMapperLib`)
+
+The library is targeted at **.NET 10.0** and exploits all modern C# 14 capabilities (such as Field-Backed Properties, Primary Constructors, and Collection Expressions) to achieve maximum performance and memory efficiency.
 
 ### Quick Start Code Snippet
 
@@ -51,78 +121,23 @@ sitemapXml.Save("sitemap.xml");
 
 ---
 
-## 💻 2. Standalone Command-Line Tool (`LinkSpiderConsole`)
+## 🔧 3. Building and Testing from Source (Developers Only)
 
-For users who just want to use the pre-built command-line crawling tool without writing code, `LinkSpiderConsole` is packaged as a ready-to-run binary. You can download the pre-compiled versions directly from the [GitHub Releases](https://github.com/JuanKRuiz/LinkSpider/releases).
+If you are a developer and want to modify or compile the codebase yourself, follow these instructions.
 
-### 🚀 Direct Download (No .NET Setup Required)
-
-If you are an SEO specialist or IT administrator, you don't need to install any software development kits. Download the archive for your operating system:
-
-| Operating System | Format | Processor | Direct Download Link |
-| :--- | :---: | :--- | :--- |
-| **Windows** | `.zip` | x64 (64-bit) | [📥 Download for Windows (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-win-x64.zip) |
-| **Linux** | `.tar.gz` | x64 (64-bit) | [📥 Download for Linux (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-linux-x64.tar.gz) |
-| **macOS (Apple Silicon)** | `.tar.gz` | ARM64 (M1/M2/M3/M4) | [📥 Download for macOS (Apple Silicon)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-arm64.tar.gz) |
-| **macOS (Intel)** | `.tar.gz` | x64 (64-bit) | [📥 Download for macOS (Intel x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-x64.tar.gz) |
-
-> [!NOTE]
-> These binaries are **self-contained** and **single-file**. They contain the entire lightweight .NET 10.0 runtime engine pre-packaged inside. Unzip the file and run the executable directly in your command line!
+### Prerequisites
+* **.NET 10.0 SDK** (with C# 14 compiler)
 
 ### Compiling the Standalone Executable
 
-To compile a native, portable release of the console client, execute:
+To compile a native, portable, self-contained release of the console client, execute:
 
 ```bash
-# 1. Publish the project to a local directory (dist)
-dotnet publish SiteMapperBash/LinkSpiderConsole.csproj -c Release -o ./dist
+# Publish the project to a local directory (dist)
+dotnet publish SiteMapperBash/LinkSpiderConsole.csproj -c Release -o ./dist -p:PublishSingleFile=true --self-contained true
 ```
 
-### Running the Executable Directly
-
-Once compiled or downloaded, run the binary directly from your terminal (**avoiding slow `dotnet run` calls**):
-
-```bash
-# On Linux / macOS:
-./dist/LinkSpiderConsole --url https://yoursite.com
-
-# On Windows:
-dist\LinkSpiderConsole.exe --url https://yoursite.com
-```
-
-### ⚙️ Command-Line Options
-
-The utility is fully configurable via parameters:
-
-| Flag | Parameter | Description |
-| :--- | :--- | :--- |
-| `-u` | `--url=VALUE` | **Required.** The target website URL to start link exploration. |
-| `-s` | `--sitemap=VALUE`| Custom filename for the generated XML sitemap (Default: `sitemap.xml`). |
-| `-p` | `--plain=VALUE`  | Custom filename for the list of discovered internal links (Default: `plain.txt`). |
-| `-n` | `--navfilter=VAL`| Comma-separated paths to ignore during crawling (e.g., `/tag/,/pages/`). |
-| `-m` | `--smapfilter=V` | Comma-separated paths to exclude from the sitemap (but still crawl them). |
-| `-c` | `--unicode`      | Use Unicode encoding for the output sitemap.xml. |
-| `-o` | `--single`       | Single page scan mode (scans the landing page only; does not recurse). |
-| `-h` | `--help`         | Show the help manual and parameter list. |
-
-#### Examples of Executable Commands:
-
-* **Basic Crawl and Sitemap Generation:**
-  ```bash
-  ./LinkSpiderConsole --url https://example.com
-  ```
-* **Ignore admin and login folders:**
-  ```bash
-  ./LinkSpiderConsole --url https://example.com --navfilter /admin/,/login/
-  ```
-* **Single-page crawl (checking homepage links only):**
-  ```bash
-  ./LinkSpiderConsole --url https://example.com --single --plain homepage_links.txt
-  ```
-
----
-
-## 🧪 Testing and Integration
+### 🧪 Running Unit Tests
 
 Both components are thoroughly validated via an automated xUnit test suite running under .NET 10.0:
 
@@ -131,9 +146,7 @@ Both components are thoroughly validated via an automated xUnit test suite runni
 dotnet test SiteMapperTests/SiteMapperTests.csproj
 ```
 
----
-
-## ⚙️ VS Code Workspace Integration
+### 💻 VS Code Workspace Integration
 
 Open the root folder in VS Code to utilize:
 - **Build Task (`Ctrl+Shift+B`):** Automatic solution compilation.
@@ -144,4 +157,4 @@ Open the root folder in VS Code to utilize:
 
 ## 📜 License
 
-Distributed under the MIT License. See `LICENSE` for details.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
