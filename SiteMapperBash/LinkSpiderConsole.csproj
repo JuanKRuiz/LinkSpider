@@ -6,7 +6,7 @@
     <RootNamespace>LinkSpiderConsole</RootNamespace>
     <AssemblyName>LinkSpiderConsole</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

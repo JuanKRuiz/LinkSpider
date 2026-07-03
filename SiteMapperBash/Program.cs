@@ -78,10 +78,10 @@ internal static class Program
         }
 
 #if DEBUG
-        ConsoleExt.WriteTitle(" PRESIONE ENTER PARA SALIR ", true);
+        ConsoleExt.WriteTitle(" PRESS ENTER TO EXIT ", true);
         Console.ReadLine();
 #endif
-        ConsoleExt.WriteTitle("  F  I  N  ", true);
+        ConsoleExt.WriteTitle("  E  N  D  ", true);
     }
 
     private static void DrawHeader()
