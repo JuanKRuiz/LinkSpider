@@ -1,6 +1,6 @@
 # Link Spider Architecture 📐
 
-This document outlines the software design, asynchronous concurrency model, and core logical workflows of **LinkSpider**, modernized to **.NET 9.0** and **C# 13**.
+This document outlines the software design, asynchronous concurrency model, and core logical workflows of **LinkSpider**, modernized to **.NET 10.0** and **C# 14**.
 
 ---
 
@@ -94,9 +94,10 @@ This guarantees:
 
 ---
 
-## 4. Modern C# 13 Syntactic Elements
+## 4. Modern C# 14 Syntactic Elements
 
 The codebase has been refactored to employ advanced language semantics:
+*   **Field-Backed Properties (`field` keyword):** Used in `LinkElement.Url` and `LinkSpider.URLExplorationFilter` to dynamically trim values and prevent null references on auto-properties without manual private backing fields.
 *   **File-Scoped Namespaces:** Reduces deep nesting and keeps file structure cleaner (`namespace LinkSpiderLib;`).
 *   **Primary Constructors:** Adopted in `SitemapTarantula` for clean, boilerplate-free dependency injection.
 *   **Collection Expressions:** Used `[]` for arrays and inline list instantiations, optimizing memory footprint.

@@ -17,7 +17,11 @@ public class LinkSpider : IDisposable
     private bool _disposed;
 
     public Uri OriginalUrl => _originalUrl;
-    public List<string> URLExplorationFilter { get; set; } = [];
+    public List<string> URLExplorationFilter
+    {
+        get => field ??= [];
+        set => field = value ?? [];
+    }
 
     private readonly ConcurrentDictionary<string, LinkElement> _fullUrlList = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, byte> _externalUrlList = new(StringComparer.OrdinalIgnoreCase);

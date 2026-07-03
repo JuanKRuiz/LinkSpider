@@ -1,11 +1,11 @@
 # Link Spider 🕷️
 
-[![Build Status](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+[![Build Status](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Link Spider** is a high-performance, fully asynchronous, cross-platform library and command-line utility for crawling websites, discovering broken or external links, and generating standard, compliant `sitemap.xml` files. 
 
-Completely modernized from legacy .NET Framework to **.NET 9.0** and **C# 13**, it features thread-safe concurrent architecture, robust relative URI resolution, non-blocking async network operations, and optimized regex-based link extraction.
+Completely modernized from legacy .NET Framework to **.NET 10.0** and **C# 14**, it features thread-safe concurrent architecture, robust relative URI resolution, non-blocking async network operations, and optimized regex-based link extraction.
 
 ---
 
@@ -16,7 +16,7 @@ Completely modernized from legacy .NET Framework to **.NET 9.0** and **C# 13**, 
 - **Perfect Relative Pathing Resolution:** Dynamically resolves relative paths using the actual page of origin URL as base (`new Uri(baseUri, relativeUri)`), avoiding broken pathing traps on nested routes.
 - **Robust Case-Insensitive Matching:** Pre-compiled, highly optimized Regex matching for anchor tags (`<a href="...">`), supporting any casing, single or double quotes, and multi-attribute links.
 - **Sitemap Filtering:** Full support to exclude specific URL patterns from being crawled or listed in the generated XML sitemap.
-- **Cross-Platform:** Built natively on .NET 9.0, running flawlessly on Linux, macOS, and Windows.
+- **Cross-Platform:** Built natively on .NET 10.0, running flawlessly on Linux, macOS, and Windows.
 - **Developer-Friendly VS Code Integration:** Complete with pre-configured `.vscode/` settings, compilation tasks, and debugger profiles.
 
 ---
@@ -25,10 +25,10 @@ Completely modernized from legacy .NET Framework to **.NET 9.0** and **C# 13**, 
 
 ```
 LinkSpider/
-├── SiteMapperLib/         # Core engine (.NET 9 Class Library)
+├── SiteMapperLib/         # Core engine (.NET 10 Class Library)
 │   ├── LinkSpider.cs      # Asynchronous crawler orchestrator
 │   └── SitemapTarantula.cs # Compliant XML sitemap builder
-├── SiteMapperBash/        # Command-Line Interface (.NET 9 Console App)
+├── SiteMapperBash/        # Command-Line Interface (.NET 10 Console App)
 │   └── Program.cs         # CLI execution shell & Option Parser
 ├── SiteMapperTests/       # Unit Testing Suite (xUnit)
 │   └── SitemapTarantulaTests.cs
@@ -40,7 +40,7 @@ LinkSpider/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 
 ### Installation
 Clone the repository and compile:

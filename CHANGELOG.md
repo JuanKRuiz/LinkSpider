@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-07-03] - Modernización Tecnológica Completa (.NET 10 & C# 14)
+
+### ✨ New Features
+- **Propiedades con Respaldo de Campo (C# 14 `field` keyword):** Adoptado el nuevo keyword `field` de C# 14 en `LinkElement.Url` (para realizar sanitizaciones de URLs automáticamente al asignarlas) y en `LinkSpider.URLExplorationFilter` (para implementar salvaguardas contra valores nulos), reduciendo drásticamente el código redundante (*boilerplate*) de backing fields privados.
+
+### 🔧 Refactoring and Improvements
+- **Actualización de Infraestructura (.NET 10.0):** Migrados por completo todos los proyectos del repositorio (`LinkSpiderConsole.csproj`, `LinkSpider.csproj`, y `SiteMapperTests.csproj`) a la versión más reciente del framework de largo plazo, **.NET 10.0**, maximizando las optimizaciones del compilador y JIT.
+
+### 📚 Documentation
+- **Actualización de Documentos de Arquitectura y Guías:** Reescritos `README.md` y `ARCHITECTURE.md` para reflejar el estado del arte tecnológico con .NET 10.0 y las capacidades sintácticas avanzadas de C# 14.
+
 ## [2026-07-03] - Modernización Arquitectónica y Concurrencia (.NET 9)
 
 ### 🔧 Refactoring and Improvements
