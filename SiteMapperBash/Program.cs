@@ -1,4 +1,4 @@
-﻿using LinkSpiderLib;
+using LinkSpiderLib;
 using Mono.Options;
 using System;
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace LinkSpiderConsole
             {
                 Stopwatch sw = new Stopwatch();
 
-                LinkSpider ls = new LinkSpider(_url.AbsoluteUri);
+                using var ls = new LinkSpider(_url.AbsoluteUri);
 
                 ls.URLExplorationFilter.AddRange(_urlNavFilter);
                 Console.WriteLine("Starting to Weave Web");

@@ -1,0 +1,21 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2026-07-03] - Modernización Arquitectónica y Concurrencia (.NET 9)
+
+### 🔧 Refactoring and Improvements
+- **Migración a .NET 9.0 (SDK-style):** Actualizados los archivos de proyecto `LinkSpider.csproj` y `LinkSpiderConsole.csproj` al estándar moderno de SDK-style, removiendo dependencias obsoletas y perfiles de Portable Class Library (PCL).
+- **Higiene del Repositorio:** Removidos archivos heredados sin uso en .NET moderno: `App.config`, `packages.config`, y metadatos redundantes en `Properties/AssemblyInfo.cs`.
+- **Motor de Rastreo Asincrónico:** Reescrito por completo `LinkSpider.cs` para soportar asincronismo de extremo a extremo (`async/await`) nativo, eliminando bloqueos sincrónicos (`.Result`) en peticiones de red.
+- **Control de Concurrencia:** Incorporado `SemaphoreSlim` para regular de forma segura el grado de paralelismo máximo de las peticiones HTTP concurrentes.
+- **Gestión de Recursos Práctica:** Implementado el patrón `IDisposable` sobre `LinkSpider` para liberar el ciclo de vida del `HttpClient` y adaptada su instanciación en `Program.cs` mediante la declaración simplificada `using var` de C#.
+- **Robustez de Red:** Añadido cabezal de `User-Agent` personalizado por defecto para evitar bloqueos por políticas anti-bot de servidores web de hosting.
+
+### 🐛 Bug Fixes
+- **Eliminación de Condiciones de Carrera (Race Conditions):** Corregida la inseguridad de hilos al procesar listas concurrentes mediante la transición de `HashSet<T>` a colecciones thread-safe concurrentes (`ConcurrentDictionary<string, LinkElement>` y `ConcurrentDictionary<string, byte>`).
+- **Resolución Correcta de URLs Relativas:** Solucionado el bug de pathing que calculaba rutas relativas de manera absoluta sobre la raíz del sitio. Ahora las URLs se resuelven dinámicamente usando el URL exacto de la página que contiene el enlace como base (`new Uri(baseUri, relativeUri)`).
+- **Extracción de HTML Flexible:** Resuelta la fragilidad de extracción regex aplicando compilación y opción de insensibilidad a mayúsculas (`RegexOptions.IgnoreCase`), permitiendo capturar etiquetas de enlace en cualquier formato o estructura de comillas (simples o dobles).
