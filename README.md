@@ -43,11 +43,11 @@ LinkSpider/
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 
 ### Installation
-Clone the repository and compile the solution:
+Clone the repository and compile:
 ```bash
 git clone https://github.com/JuanKRuiz/LinkSpider.git
 cd LinkSpider
-dotnet build SiteMapperLib/LinkSpider.sln
+dotnet build SiteMapperBash/LinkSpiderConsole.csproj
 ```
 
 ---
@@ -91,9 +91,9 @@ dotnet run --project SiteMapperBash/LinkSpiderConsole.csproj -- --u https://your
 
 ## 🧪 Running Tests
 
-The solution includes a thorough suite of xUnit tests verifying the parser, collections, and filtering:
+The test suite includes a thorough set of xUnit tests verifying the parser, collections, and filtering:
 ```bash
-dotnet test SiteMapperLib/LinkSpider.sln
+dotnet test SiteMapperTests/SiteMapperTests.csproj
 ```
 
 ---

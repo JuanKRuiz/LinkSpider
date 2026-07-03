@@ -1,5 +1,4 @@
 {
-  "dotnet.defaultSolution": "SiteMapperLib/LinkSpider.sln",
   "csharp.unitTestDebuggingOptions": {
     "console": "internalConsole"
   },

@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/SiteMapperLib/LinkSpider.sln",
+        "${workspaceFolder}/SiteMapperBash/LinkSpiderConsole.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -23,11 +23,25 @@
       "type": "process",
       "args": [
         "publish",
-        "${workspaceFolder}/SiteMapperLib/LinkSpider.sln",
+        "${workspaceFolder}/SiteMapperBash/LinkSpiderConsole.csproj",
         "-c",
         "Release"
       ],
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "${workspaceFolder}/SiteMapperTests/SiteMapperTests.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
     }
   ]
 }
