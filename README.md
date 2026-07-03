@@ -53,7 +53,21 @@ sitemapXml.Save("sitemap.xml");
 
 ## 💻 2. Standalone Command-Line Tool (`LinkSpiderConsole`)
 
-For users who just want to use the pre-built command-line crawling tool without writing code, `LinkSpiderConsole` is packaged as a ready-to-run binary. You can build it as a native, single-file executable or download pre-compiled versions from the [GitHub Releases](https://github.com/JuanKRuiz/LinkSpider/releases).
+For users who just want to use the pre-built command-line crawling tool without writing code, `LinkSpiderConsole` is packaged as a ready-to-run binary. You can download the pre-compiled versions directly from the [GitHub Releases](https://github.com/JuanKRuiz/LinkSpider/releases).
+
+### 🚀 Direct Download (No .NET Setup Required)
+
+If you are an SEO specialist or IT administrator, you don't need to install any software development kits. Download the archive for your operating system:
+
+| Operating System | Format | Processor | Direct Download Link |
+| :--- | :---: | :--- | :--- |
+| **Windows** | `.zip` | x64 (64-bit) | [📥 Download for Windows (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-win-x64.zip) |
+| **Linux** | `.tar.gz` | x64 (64-bit) | [📥 Download for Linux (x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-linux-x64.tar.gz) |
+| **macOS (Apple Silicon)** | `.tar.gz` | ARM64 (M1/M2/M3/M4) | [📥 Download for macOS (Apple Silicon)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-arm64.tar.gz) |
+| **macOS (Intel)** | `.tar.gz` | x64 (64-bit) | [📥 Download for macOS (Intel x64)](https://github.com/JuanKRuiz/LinkSpider/releases/download/v2.0.0/LinkSpiderConsole-osx-x64.tar.gz) |
+
+> [!NOTE]
+> These binaries are **self-contained** and **single-file**. They contain the entire lightweight .NET 10.0 runtime engine pre-packaged inside. Unzip the file and run the executable directly in your command line!
 
 ### Compiling the Standalone Executable
 
