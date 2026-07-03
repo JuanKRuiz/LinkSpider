@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace LinkSpiderLib
+namespace LinkSpiderLib;
+
+public class LinkElementComparer : IEqualityComparer<LinkElement>
 {
-                    
-    public class LinkElementComparer: IEqualityComparer<LinkElement>
+    public bool Equals(LinkElement? x, LinkElement? y)
     {
-        public bool Equals(LinkElement x, LinkElement y)
-        {
-            return x.url == y.url;
-        }
-
-        public int GetHashCode(LinkElement obj)
-        {
-            return obj.url.GetHashCode();
-        }
+        if (ReferenceEquals(x, y)) return true;
+        if (x is null || y is null) return false;
+        return string.Equals(x.Url, y.Url, StringComparison.OrdinalIgnoreCase);
     }
+
+    public int GetHashCode(LinkElement obj) => 
+        StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Url);
 }

@@ -1,188 +1,195 @@
-using LinkSpiderLib;
-using Mono.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LinkSpiderLib;
+using Mono.Options;
 
-namespace LinkSpiderConsole
+namespace LinkSpiderConsole;
+
+internal static class Program
 {
-    class Program
+    private static Uri? _url;
+    private static string _sitemapFile = "sitemap.xml";
+    private static string _plainFile = "plain.txt";
+    private static bool _showHelp;
+    private static bool _useUnicode;
+    private static bool _singleWebPage;
+    private static readonly List<string> _urlNavFilter = [];
+    private static readonly List<string> _urlSitemapFilter = [];
+
+    private static void Main(string[] args)
     {
-        static Uri _url = null;
-        static string _sitemapFile = "sitemap.xml";
-        static string _plainFile = "plain.txt";
-        static bool _show_help = false;
-        static bool _useUnicode = false;
-        static bool _singleWebPage = false;
-        static List<string> _urlNavFilter = new List<string>();
-        static List<string> _urlSitemapFilter = new List<string>();
+        DrawHeader();
 
-        static void Main(string[] args)
+        var paramsOptions = ParseParameters(args);
+        if (args.Length == 0)
         {
-            DrawHeader();
-
-            //almost all important logic in this program is derivated from this line
-            var paramsOptions = ParseParameters(args);
-            if (args.Length == 0)
+            ConsoleExt.WriteTitle(" What you wanna do? ");
+            Console.WriteLine(" Try --help for more information.");
+        }
+        else
+        {
+            if (_url is null)
             {
-                ConsoleExt.WriteTitle(" What you wanna do? ");
-                Console.WriteLine(" Try --help for more information.");
+                Console.WriteLine("Error: URL was not specified.");
+                return;
+            }
+
+            var sw = new Stopwatch();
+
+            using var ls = new LinkSpider(_url.AbsoluteUri);
+            ls.URLExplorationFilter.AddRange(_urlNavFilter);
+
+            Console.WriteLine("Starting to Weave Web");
+            Console.WriteLine("Exploring and Building...");
+            sw.Start();
+
+            if (_singleWebPage)
+            {
+                ls.WeaveSinglePage();
             }
             else
             {
-                Stopwatch sw = new Stopwatch();
-
-                using var ls = new LinkSpider(_url.AbsoluteUri);
-
-                ls.URLExplorationFilter.AddRange(_urlNavFilter);
-                Console.WriteLine("Starting to Weave Web");
-                Console.WriteLine("Exploring and Bulding...");
-                sw.Start();
-
-                if (_singleWebPage)
-                    ls.WeaveSinglePage();
-                else
-                    ls.WeaveWeb();
-
-                sw.Stop();
-                Console.WriteLine("An incredible Web has been Weaved");
-                Console.WriteLine("Total Links: {0}", ls.FullUrlList.Count());
-                Console.WriteLine("Total External Links: {0}", ls.ExternalUrlList.Count());
-                Console.WriteLine("Total Broken Links: {0}", ls.BrokenUrlList.Count());
-                Console.WriteLine("Time: {0}", sw.Elapsed);
-
-                var sortedList = ls.FullUrlList.ToList();
-                ConsoleExt.WriteTitle("Generating files...");
-                BuildPlainFile(_plainFile, sortedList);
-                Console.WriteLine("{0} OK", _plainFile);
-                BuildPlainFile("brokenLinks.txt", ls.BrokenUrlList);
-                Console.WriteLine("{0} OK", "brokenLinks.txt");
-                BuildPlainFile("externalLinks.txt", ls.ExternalUrlList);
-                Console.WriteLine("{0} OK", "externalLinks.txt");
-
-                int counter;
-                BuildSiteMap(_sitemapFile, _useUnicode, sortedList, _urlSitemapFilter, out counter);
-                Console.WriteLine("{0} en formato Unicode: {1} OK", _sitemapFile, _useUnicode);
-                Console.WriteLine("--> Total Sitema Links: {0}", counter);
+                ls.WeaveWeb();
             }
+
+            sw.Stop();
+            Console.WriteLine("An incredible Web has been Weaved");
+            Console.WriteLine($"Total Links: {ls.FullUrlList.Count()}");
+            Console.WriteLine($"Total External Links: {ls.ExternalUrlList.Count()}");
+            Console.WriteLine($"Total Broken Links: {ls.BrokenUrlList.Count()}");
+            Console.WriteLine($"Time: {sw.Elapsed}");
+
+            var sortedList = ls.FullUrlList.ToList();
+            ConsoleExt.WriteTitle("Generating files...");
+            BuildPlainFile(_plainFile, sortedList);
+            Console.WriteLine($"{_plainFile} OK");
+            BuildPlainFile("brokenLinks.txt", ls.BrokenUrlList);
+            Console.WriteLine("brokenLinks.txt OK");
+            BuildPlainFile("externalLinks.txt", ls.ExternalUrlList);
+            Console.WriteLine("externalLinks.txt OK");
+
+            BuildSiteMap(_sitemapFile, _useUnicode, sortedList, _urlSitemapFilter, out var counter);
+            Console.WriteLine($"{_sitemapFile} in Unicode format: {_useUnicode} OK");
+            Console.WriteLine($"--> Total Sitemap Links: {counter}");
+        }
 
 #if DEBUG
-            ConsoleExt.WriteTitle(" PRESIONE ENTER PARA SALIR ", true);
-            Console.ReadLine();
+        ConsoleExt.WriteTitle(" PRESIONE ENTER PARA SALIR ", true);
+        Console.ReadLine();
 #endif
-            ConsoleExt.WriteTitle("  F  I  N  ", true);
+        ConsoleExt.WriteTitle("  F  I  N  ", true);
+    }
+
+    private static void DrawHeader()
+    {
+        ConsoleExt.WriteTitle(" LinkSpider Console by @JuanKRuiz ", true);
+        Console.WriteLine(" Licensed under MIT license");
+        ConsoleExt.WriteTitle("    Contact Info     ", true);
+        Console.WriteLine("Twitter: @JuanKRuiz");
+        Console.WriteLine("Facebook: JuanKDev");
+        Console.WriteLine("Blog: http://juank-io");
+        ConsoleExt.WriteTitle("                     ");
+    }
+
+    private static void BuildSiteMap(string sitemapFile, bool useUnicode, List<string> sortedList, List<string> filter, out int count)
+    {
+        var tarantula = new SitemapTarantula(sortedList, filter);
+
+        if (useUnicode)
+        {
+            var sitemap = tarantula.CreateStringSiteMap();
+            File.WriteAllText(sitemapFile, sitemap);
+        }
+        else
+        {
+            var sitemap = tarantula.CreateStringSiteMap(changeDeclarationTextToUTF8: true);
+            File.WriteAllText(sitemapFile, sitemap, Encoding.UTF8);
         }
 
-        private static void DrawHeader()
+        count = tarantula.Count;
+    }
+
+    private static void BuildPlainFile(string plainFile, IEnumerable<string> sortedList)
+    {
+        if (sortedList.Any())
         {
-            ConsoleExt.WriteTitle(" LinkSpider Console by @JuanKRuiz ", true);
-            Console.WriteLine(" Licensed under MIT license");
-            ConsoleExt.WriteTitle("    Contact Info     ", true);
-            Console.WriteLine("Twitter: @JuanKRuiz");
-            Console.WriteLine("Facebook: JuanKDev");
-            Console.WriteLine("Blog: http://juank-io");
-            ConsoleExt.WriteTitle("                     ");
+            File.WriteAllLines(plainFile, sortedList);
         }
+    }
 
-        private static void BuildSiteMap(string sitemapFile, bool useUnicode, List<string> sortedList, List<string> filter, out int count)
+    private static void ShowHelp(OptionSet paramsOptions)
+    {
+        ConsoleExt.WriteTitle("  H E L P  ");
+        paramsOptions.WriteOptionDescriptions(Console.Out);
+        ConsoleExt.WriteTitle("           ");
+    }
+
+    private static OptionSet ParseParameters(string[] args)
+    {
+        var paramsOptions = new OptionSet
         {
-            var tarantula = new SitemapTarantula(sortedList, filter);
-
-            string sitemap;
-
-            if (useUnicode)
-            {
-                sitemap = tarantula.CreateStringSiteMap();
-                File.WriteAllText(sitemapFile, sitemap);
+            { "u|url=", "The site {URL} to start link exploration",
+              u => {
+                  try
+                  { 
+                      _url = new Uri(u);
+                  }
+                  catch (Exception ex)
+                  {
+                      throw new OptionException("Invalid Url", "url", ex);
+                  }
+              }
+            },
+            { "s|sitemap=", "Sitemap with this name must be generated {FileName}",
+              s => _sitemapFile = s 
+            },
+            { "p|plain=", "Textfile including a link list must be generated {FileName}",
+              p => _plainFile = p
+            },
+            { "n|navfilter=", "Comma separated string with paths must be excluded in exploration\nexample: '/tag/,/pages'. Be careful with case sensitivity and white spaces",
+              n => AddCommaStringToList(_urlNavFilter, n)
+            },
+            { "m|smapfilter=", "Comma separated string with paths must be excluded in sitemap\nexample: '/tag/,/pages'. Be careful with case sensitivity and white spaces",
+              sf => AddCommaStringToList(_urlSitemapFilter, sf)
+            },
+            { "c|unicode", "Use unicode Encoding for sitemap", 
+              u => _useUnicode = u is not null
+            },
+            { "o|single", "Single web page scan", 
+              o => _singleWebPage = o is not null
+            },
+            { "h|?|help", "Show this message and exit", 
+              v => _showHelp = v is not null
             }
-            else// UTF8
-            {
-                sitemap = tarantula.CreateStringSiteMap(changeDeclarationTextToUTF8: true);
-                File.WriteAllText(sitemapFile, sitemap, Encoding.UTF8);
-            }
+        };
 
-            count = tarantula.Count;
-        }
-
-        private static void BuildPlainFile(string plainFile, IEnumerable<string> sortedList)
+        try
         {
-            if (sortedList.Count() > 0)
-                File.WriteAllLines(plainFile, sortedList);
+            paramsOptions.Parse(args);
         }
-
-        private static void ShowHelp(OptionSet paramsOptions)
+        catch (OptionException e)
         {
-            ConsoleExt.WriteTitle("  H E L P  ");
-            paramsOptions.WriteOptionDescriptions(Console.Out);
-            ConsoleExt.WriteTitle("           ");
+            ConsoleExt.WriteTitle("ERROR");
+            Console.WriteLine($"Parameter: {e.OptionName} - {e.Message}");
+            Console.WriteLine("Try --help for more information.");
+            throw;
         }
 
-        private static OptionSet ParseParameters(string[] args)
+        if (_showHelp)
         {
-            var paramsOptions = new OptionSet() {
-                    { "u|url=", "The site {URL} to start link exploration",
-                      u =>{
-                          try { 
-                          _url = new Uri(u);
-                          }catch(Exception ex)
-                          {
-                              throw new OptionException("Invalid Url", "url", ex);
-                          }
-                      }
-                    },
-                    { "s|sitemap=", "Sitemap with this name must be generated {FileName}",
-                      s => _sitemapFile = s 
-                    },
-                    { "p|plain=",  "Textfile including a link list must be generated {FileName}",
-                       p =>_plainFile = p
-                    },
-                    { "n|navfilter=",  "Comma separated string with paths must be exclued in exploration\nexample: '/tag/,/pages'.Be carefull with case sensitive and white spaces",
-                       n =>{
-                           AddCommaStringToList(_urlNavFilter,n);
-                       }
-                    },
-                    { "m|smapfilter=",  "Comma separated string with paths must be exclued in sitemap\nexample: '/tag/,/pages'.Be carefull with case sensitive and white spaces",
-                       sf =>{
-                           AddCommaStringToList(_urlSitemapFilter,sf);
-                       }
-                    },
-                    { "c|unicode",  "Use unicode Encoding for sitemap", 
-                      u => _useUnicode = (u != null )
-                    },
-                    { "o|single",  "Single web page scan", 
-                      o => _singleWebPage = (o != null )
-                    },
-                    { "h|?|help",  "Show this message and exit", 
-                      v => _show_help = (v != null )
-                    }
-
-            };
-
-            try
-            {
-                paramsOptions.Parse(args);
-            }
-            catch (OptionException e)
-            {
-                ConsoleExt.WriteTitle("ERROR");
-                Console.WriteLine("Parameter: {0} - {1}", e.OptionName, e.Message);
-                Console.WriteLine("Try --help for more information.");
-                throw;
-            }
-
-            if (_show_help)
-                ShowHelp(paramsOptions);
-
-            return paramsOptions;
+            ShowHelp(paramsOptions);
         }
 
-        private static void AddCommaStringToList(List<string> list, string f)
-        {
-            var parts = f.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-            list.AddRange(parts);
-        }
+        return paramsOptions;
+    }
+
+    private static void AddCommaStringToList(List<string> list, string f)
+    {
+        var parts = f.Split([","], StringSplitOptions.RemoveEmptyEntries);
+        list.AddRange(parts);
     }
 }

@@ -1,113 +1,83 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-namespace LinkSpiderLib
+namespace LinkSpiderLib;
+
+public class SitemapTarantula(IEnumerable<string> urlList, IEnumerable<string>? urlFilter = null)
 {
-    public class SitemapTarantula
+    private const string UTF16_HEADER = """<?xml version="1.0" encoding="utf-16"?>""";
+    private const string UTF8_HEADER = """<?xml version="1.0" encoding="utf-8"?>""";
+
+    private readonly IEnumerable<string> _urlList = urlList;
+    private readonly IEnumerable<string>? _urlSitemapFilter = urlFilter;
+
+    public int Count { get; private set; }
+
+    public XDocument CreateXMLDocumentSitemap()
     {
+        XNamespace xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9";
+        XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
+        XNamespace schemaLocation = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
+        
+        var changefreq = new XElement(xmlns + "changefreq", "daily");
+        var priority = new XElement(xmlns + "priority", "0.5");
 
-        const string UTF16_HEADER = @"<?xml version=""1.0"" encoding=""utf-16""?>";
-        const string UTF8_HEADER = @"<?xml version=""1.0"" encoding=""utf-8""?>";
+        var xdoc = new XDocument(new XDeclaration("1.0", "utf-8", null));
+        var urlset = new XElement(xmlns + "urlset",
+            new XAttribute(XNamespace.Xmlns + "xsi", xsi.ToString()),
+            new XAttribute(xsi + "schemaLocation", schemaLocation.ToString()));
 
-        IEnumerable<string> _URLList;
-        IEnumerable<string> _urlSitemapFilter;
-        public int Count { get; set; }
+        xdoc.Add(urlset);
 
-        public SitemapTarantula(IEnumerable<string> urlList)
+        foreach (var link in _urlList)
         {
-            _URLList = urlList;
-        }
-
-        public SitemapTarantula(IEnumerable<string> urlList, IEnumerable<string> urlfilter)
-        {
-            _URLList = urlList;
-            _urlSitemapFilter = urlfilter;
-        }
-
-        public XDocument CreateXMLDocumentSitemap()
-        {
-            var xmlns = (XNamespace)"http://www.sitemaps.org/schemas/sitemap/0.9";
-            var xsi = (XNamespace)"http://www.w3.org/2001/XMLSchema-instance";
-            var schemaLocation = (XNamespace)"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
-            var changefreq = new XElement(xmlns + "changefreq", "daily");
-            var priority = new XElement(xmlns + "priority", "0.5");
-
-            XDocument xdoc = new XDocument(new XDeclaration("1.0", "utf-8", null));
-            var urlset = new XElement(xmlns + "urlset",
-                    new XAttribute(XNamespace.Xmlns + "xsi", xsi.ToString()),
-                    new XAttribute(xsi + "schemaLocation", schemaLocation.ToString()));
-
-            xdoc.Add(urlset);
-
-            foreach (var link in _URLList)
+            if (!MatchWithFilter(link))
             {
-                if (!MatchWithFilter(link))
-                {
-                    var loc = new XElement(xmlns + "loc", link);
-                    var url = new XElement(xmlns + "url", loc, changefreq, priority);
-                    Count++;
-                    urlset.Add(url);
-                }
+                var loc = new XElement(xmlns + "loc", link);
+                var url = new XElement(xmlns + "url", loc, changefreq, priority);
+                Count++;
+                urlset.Add(url);
             }
-            return xdoc;
         }
+        return xdoc;
+    }
 
-        private bool MatchWithFilter(string link)
+    private bool MatchWithFilter(string link)
+    {
+        if (_urlSitemapFilter is null) return false;
+
+        foreach (var item in _urlSitemapFilter)
         {
-            bool rta = false;
-
-            if (_urlSitemapFilter == null)
-                rta = false;
-            else
+            if (link.Contains(item, StringComparison.OrdinalIgnoreCase))
             {
-                foreach (var item in _urlSitemapFilter)
-                {
-                    if (link.Contains(item))
-                    {
-                        rta = true;
-                        break;
-                    }
-                }
+                return true;
             }
-
-            return rta;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>Returns UTF 16 Encoding</remarks>
-        /// <param name="changeDeclarationTextToUTF8">Change xml declaration text, but string still being UTF 16</param>
-        /// <returns></returns>
-        public string CreateStringSiteMap(bool changeDeclarationTextToUTF8 = false)
-        {
-            StringWriter sw = new StringWriter();
+        return false;
+    }
 
-            var xdoc = CreateXMLDocumentSitemap();
-            xdoc.Save(sw);
+    public string CreateStringSiteMap(bool changeDeclarationTextToUTF8 = false)
+    {
+        using var sw = new StringWriter();
+        var xdoc = CreateXMLDocumentSitemap();
+        xdoc.Save(sw);
 
-            var ret = sw.ToString();
-            if (changeDeclarationTextToUTF8)
-                ret = ret.Replace(UTF16_HEADER, UTF8_HEADER);
+        var ret = sw.ToString();
+        return changeDeclarationTextToUTF8 ? ret.Replace(UTF16_HEADER, UTF8_HEADER) : ret;
+    }
 
-            return ret;
-        }
+    public byte[] CreateByteArrSiteMapUTF8()
+    {
+        using var sw = new StringWriterUTF8();
+        var xdoc = CreateXMLDocumentSitemap();
+        xdoc.Save(sw);
 
+        var utf16string = sw.ToString();
+        var utf8string = utf16string.Replace(UTF16_HEADER, UTF8_HEADER);
 
-        public byte[] CreateByteArrSiteMapUTF8()
-        {
-            StringWriterUTF8 sw = new StringWriterUTF8();
-
-            var xdoc = CreateXMLDocumentSitemap();
-            xdoc.Save(sw);
-
-            var utf16string = sw.ToString();
-
-            var utf8tring = utf16string.Replace(UTF16_HEADER, UTF8_HEADER);
-
-            return Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(utf8tring));
-        }
+        return Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(utf8string));
     }
 }

@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
-namespace LinkSpiderLib
+namespace LinkSpiderLib;
+
+[DebuggerDisplay("Url = {Url} , Explored = {Explored}")]
+public class LinkElement
 {
-    [DebuggerDisplay("url = {url} , explored = {explored}")]
-    public class LinkElement
-    {
-        public string url = string.Empty;
-        public bool explored = false;
-    }
+    public required string Url { get; set; }
+    public bool Explored { get; set; }
 }
